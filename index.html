@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informasi Gempa</title>
+    <!-- Include Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha384-vyV3XOWoFsFv5SRB9S+SNvsgNGJPU3GJx8f4LA5Pks6E9Cr6o8Jb5SKFbA2Dp2If" crossorigin=""/>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ecf0f1; /* Warna biru muda */
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            text-align: center;
+            color: #3498db; /* Warna biru */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        a {
+            color: #3498db; /* Warna biru */
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        #map {
+            height: 400px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Informasi Gempa Terkini</h1>
+        <table>
+            <tr>
+                <th>Item</th>
+                <th>Detail</th>
+            </tr>
+            <tr>
+                <td>Tanggal</td>
+                <td id="tanggal"></td>
+            </tr>
+            <tr>
+                <td>Jam</td>
+                <td id="jam"></td>
+            </tr>
+            <tr>
+                <td>Koordinat</td>
+                <td id="koordinat"></td>
+            </tr>
+            <tr>
+                <td>Magnitude</td>
+                <td id="magnitude"></td>
+            </tr>
+            <tr>
+                <td>Kedalaman</td>
+                <td id="kedalaman"></td>
+            </tr>
+            <tr>
+                <td>Wilayah</td>
+                <td id="wilayah"></td>
+            </tr>
+            <tr>
+                <td>Dirasakan</td>
+                <td id="dirasakan"></td>
+            </tr>
+            <tr>
+                <td>Shakemap</td>
+                <td id="shakemap"></td>
+            </tr>
+        </table>
+        <div id="map"></div>
+    </div>
+
+    <!-- Include Google Maps API dengan API key -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAmR_8JUI7q6-EutJJyjYiXnfxDAp3Mnok&callback=initMap" async defer></script>
+    <!-- Include Leaflet library -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha384-QCk5uFXzHobR8cZF4Fkz2E3tCSqf5ERF8XG4NQQv3hjz2qI0eVWPIk1fIbEL3z9D" crossorigin=""></script>
+
+    <script>
+        // Function to initialize the map
+        function initMap(lat, lng) {
+            // Initialize map
+            var map = L.map('map').setView([lat, lng], 10);
+
+            // Add tile layer (OpenStreetMap)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            // Add marker
+            L.marker([lat, lng]).addTo(map)
+                .bindPopup('Lokasi Gempa')
+                .openPopup();
+        }
+
+        // Function to fetch earthquake data and update the page
+        function fetchEarthquakeData() {
+            fetch('https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json')
+                .then(response => response.json())
+                .then(data => {
+                    const gempa = data.Infogempa.gempa;
+                    document.getElementById('tanggal').textContent = gempa.Tanggal;
+                    document.getElementById('jam').textContent = gempa.Jam;
+                    document.getElementById('koordinat').textContent = gempa.Coordinates;
+                    document.getElementById('magnitude').textContent = gempa.Magnitude;
+                    document.getElementById('kedalaman').textContent = gempa.Kedalaman;
+                    document.getElementById('wilayah').textContent = gempa.Wilayah;
+                    document.getElementById('dirasakan').textContent = gempa.Dirasakan;
+                    document.getElementById('shakemap').innerHTML = `<a href="${gempa.Shakemap}" target="_blank">Lihat Shakemap</a>`;
+
+                    // Extract latitude and longitude from coordinates
+                    const coordinates = gempa.Coordinates.split(',');
+                    const lat = parseFloat(coordinates[0]);
+                    const lng = parseFloat(coordinates[1]);
+
+                    // Initialize map with the obtained coordinates
+                    initMap(lat, lng);
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // Call fetchEarthquakeData initially and every 10 seconds
+        fetchEarthquakeData();
+        setInterval(fetchEarthquakeData, 10000);
+    </script>
+</body>
+</html>
