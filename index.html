@@ -92,6 +92,10 @@
                 <td>Shakemap</td>
                 <td id="shakemap"></td>
             </tr>
+            <tr>
+                <td>Waktu Terakhir Diperbarui</td>
+                <td id="waktu-terakhir"></td>
+            </tr>
         </table>
         <div id="map"></div>
     </div>
@@ -140,6 +144,13 @@
 
                     // Initialize map with the obtained coordinates
                     initMap(lat, lng);
+
+                    // Update waktu terakhir
+                    const waktuSekarang = new Date();
+                    const jam = waktuSekarang.getHours();
+                    const menit = waktuSekarang.getMinutes();
+                    const detik = waktuSekarang.getSeconds();
+                    document.getElementById('waktu-terakhir').textContent = `${jam}:${menit}:${detik}`;
                 })
                 .catch(error => console.error('Error fetching data:', error));
         }
