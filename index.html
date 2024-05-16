@@ -207,7 +207,7 @@
                 })
                 .catch(error => console.error('Error fetching data:', error));
         }
-
+        
         // Panggil fetchEarthquakeData secara awal dan setiap 10 detik
         fetchEarthquakeData();
         setInterval(fetchEarthquakeData, 10000);
