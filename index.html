@@ -53,7 +53,6 @@
     </style>
 </head>
 <body>
-    <button onclick="sendTestMessage()">Kirim Pesan Test</button>
     <div class="container">
         <h1>Informasi Gempa Terkini</h1>
         <table>
@@ -101,42 +100,12 @@
         <div id="map"></div>
     </div>
 
+    <!-- Include Google Maps API dengan API key -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAmR_8JUI7q6-EutJJyjYiXnfxDAp3Mnok&callback=initMap" async defer></script>
     <!-- Include Leaflet library -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha384-QCk5uFXzHobR8cZF4Fkz2E3tCSqf5ERF8XG4NQQv3hjz2qI0eVWPIk1fIbEL3z9D" crossorigin=""></script>
-    <!-- Include Axios library -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script>
-        function sendTestMessage() {
-            const botToken = '6777441939:AAHuIVXs3C7b9NyVn_lV1sBjLgKxmTkRMak'; // Ganti dengan token bot Anda
-            const chatId = '1292347016'; // Ganti dengan ID obrolan yang dituju
-            const message = 'Ada Gempa.';
-
-            https://api.telegram.org/6777441939:AAHuIVXs3C7b9NyVn_lV1sBjLgKxmTkRMak/getUpdates
-
-            // Kirim permintaan HTTP POST ke Bot API Telegram
-            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    chat_id: chatId,
-                    text: message
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Gagal mengirim pesan ke Telegram');
-                }
-                console.log('Pesan berhasil dikirim ke Telegram');
-            })
-            .catch(error => {
-                console.error('Gagal mengirim pesan ke Telegram:', error);
-            });
-        }
-
-
         // Function to initialize the map
         function initMap(lat, lng) {
             // Initialize map
@@ -152,24 +121,6 @@
                 .bindPopup('Lokasi Gempa')
                 .openPopup();
         }
-
-        // Function to send message to Telegram
-        const sendMessageToTelegram = async (message) => {
-            try {
-                const botToken = '6777441939:AAHuIVXs3C7b9NyVn_lV1sBjLgKxmTkRMak'; // Ganti dengan token bot Anda
-                const chatId = '1292347016'; // Ganti dengan ID obrolan yang dituju
-
-                // Kirim permintaan HTTP POST ke Bot API Telegram
-                await axios.post(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                    chat_id: chatId,
-                    text: message
-                });
-
-                console.log('Pesan berhasil dikirim ke Telegram');
-            } catch (error) {
-                console.error('Gagal mengirim pesan ke Telegram:', error);
-            }
-        };
 
         // Function to fetch earthquake data and update the page
         function fetchEarthquakeData() {
@@ -200,15 +151,11 @@
                     const menit = waktuSekarang.getMinutes().toString().padStart(2, '0');
                     const detik = waktuSekarang.getSeconds().toString().padStart(2, '0');
                     document.getElementById('waktu-terakhir').textContent = `${jam}:${menit}:${detik}`;
-
-                    // Kirim notifikasi ke Telegram
-                    const pesanTelegram = `ℹ️ Informasi Gempa Terkini:\nTanggal: ${gempa.Tanggal}\nJam: ${gempa.Jam}\nKoordinat: ${gempa.Coordinates}\nMagnitude: ${gempa.Magnitude}\nKedalaman: ${gempa.Kedalaman}\nWilayah: ${gempa.Wilayah}\nDirasakan: ${gempa.Dirasakan}\nShakemap: ${gempa.Shakemap}`;
-                    sendMessageToTelegram(pesanTelegram);
                 })
                 .catch(error => console.error('Error fetching data:', error));
         }
-        
-        // Panggil fetchEarthquakeData secara awal dan setiap 10 detik
+
+        // Call fetchEarthquakeData initially and every 10 seconds
         fetchEarthquakeData();
         setInterval(fetchEarthquakeData, 10000);
     </script>
